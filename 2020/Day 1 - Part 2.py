@@ -1,16 +1,12 @@
-input1 = open("inputs/Day1Input.txt", "r")
-for line in input1:
-    input2 = open("inputs/Day1Input.txt", "r")
-    for line2 in input2:
-        input3 = open("inputs/Day1Input.txt", "r")
-        for line3 in input3:
-            sum = int(line) + int(line2) + int(line3)
-            if sum == 2020:
-                product = int(line) * int(line2) * int(line3)
-                break
-        input3.close()
-    input2.close()
-
-print(product)
+with open("inputs/Day1Input.txt") as f:
+    inputs = [int(line.strip()) for line in f]
+    for line in inputs:
+        for line2 in inputs:
+            for line3 in inputs:
+                sum = int(line) + int(line2) + int(line3)
+                if sum == 2020:
+                    product = int(line) * int(line2) * int(line3)
+                    break
+    print(product)
 
 
