@@ -72,6 +72,12 @@ def check_left():
         board[guard_row][guard_col] = "^"
 
 
+def print_board():
+    for i in board:
+        print("".join(i))
+    print()
+
+
 with open("data.txt") as f:
     for row, line in enumerate(f):
         board_line = list(line.strip())
@@ -96,4 +102,5 @@ while not done:
     elif guard_character == "<":
         done = check_left()
 
+print_board()
 print(num_spaces + 1)
