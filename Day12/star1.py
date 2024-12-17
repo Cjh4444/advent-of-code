@@ -21,13 +21,6 @@ def map_plot(board, coords, coords_set):
         map_plot(board, (coords[0], coords[1] + 1), coords_set)
     
     return coords_set
-    
-        
-def find_region_coords(board: list[list], region: str, region_coords: dict[str, list]):
-    for r_idx , row in enumerate(board):
-        for c_idx, space in enumerate(row):
-            if space == region:
-                region_coords.setdefault(region, []).append((r_idx, c_idx))
 
 def find_perimeter(board, coord_set):
     total = 0
