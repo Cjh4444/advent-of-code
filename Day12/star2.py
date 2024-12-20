@@ -1,89 +1,76 @@
-def print_board(board):
+board: list[list] = []
+all_coords: set[tuple] = set()
+
+def print_board():
     for row in board:
         print("".join(row))
         
-def map_plot(board, coords, coords_set):
-    coords_set.add(coords)
-    if coords[0] - 1 >= 0 and board[coords[0] - 1][coords[1]] == board[coords[0]][coords[1]] and (coords[0] - 1, coords[1]) not in coords_set:
-        coords_set.add((coords[0] - 1, coords[1]))
-        map_plot(board, (coords[0] - 1, coords[1]), coords_set)
+directions = [(1,0), (-1,0), (0,1), (0,-1)]
+def map_plot(coord, coords_set):
+    coords_set.add(coord)
     
-    if coords[0] + 1 < len(board) and board[coords[0] + 1][coords[1]] == board[coords[0]][coords[1]] and (coords[0] + 1, coords[1]) not in coords_set:
-        coords_set.add((coords[0] + 1, coords[1]))
-        map_plot(board, (coords[0] + 1, coords[1]), coords_set)
-    
-    if coords[1] - 1 >= 0 and board[coords[0]][coords[1] - 1] == board[coords[0]][coords[1]] and (coords[0], coords[1] - 1) not in coords_set:
-        coords_set.add((coords[0], coords[1] - 1))
-        map_plot(board, (coords[0], coords[1] - 1), coords_set)
-    
-    if coords[1] + 1 < len(board[0]) and board[coords[0]][coords[1] + 1] == board[coords[0]][coords[1]] and (coords[0], coords[1] + 1) not in coords_set:
-        coords_set.add((coords[0], coords[1] + 1))
-        map_plot(board, (coords[0], coords[1] + 1), coords_set)
+    for d in directions:
+        ny, nx = coord[0] + d[0], coord[1] + d[1]
+        if (ny in range(len(board)) and nx in range(len(board[0])) and
+            board[coord[0]][coord[1]] == board[ny][nx] and (ny,nx) not in coords_set):
+            coords_set.add((ny, nx))
+            map_plot((ny,nx), coords_set)
     
     return coords_set
-    
-        
-def find_region_coords(board: list[list], region: str, region_coords: dict[str, list]):
-    for r_idx , row in enumerate(board):
-        for c_idx, space in enumerate(row):
-            if space == region:
-                region_coords.setdefault(region, []).append((r_idx, c_idx))
 
-def find_num_sides(board, coord_set):    
-    start_coord = coord_set.pop()
-    
-    while True:
-        above = coord[0] - 1 < 0 or (coord[0] - 1, coord[1]) not in coord_set
-        below = coord[0] + 1 >= len(board) or (coord[0] + 1, coord[1]) not in coord_set
-        left = coord[1] - 1 < 0 or (coord[0], coord[1] - 1) not in coord_set
-        right = coord[1] + 1 >= len(board[0]) or (coord[0], coord[1] + 1) not in coord_set
-    
-        if above + below + left + right == 0:
-            start_coord = (start_coord[0] + 1, start_coord[0])
-        else:
-            break
-        
-    while above + below + left + right == 0:
-        start_coord = (start_coord[0] + 1, start_coord[0])
-    
-    """
-    0 - up
-    1 - right
-    2 - down
-    3 - left
-    """
-    direction = -1
-    if left:
-        direction = 0
-    elif above:
-        direction = 1
-    elif right:
-        direction = 2
-    elif below:
-        direction = 3
-    
-    start_direction = direction
-    current
-    
-    while: #ISSUE WITH THE INNER FENCES, TALK TO DAD
-    
-    
-        
-    
-    
-    
-    region = board[coord[0]][coord[1]]
-    above = coord[0] - 1 < 0 or board[coord[0] - 1][coord[1]] != region
-    below = coord[0] + 1 >= len(board) or board[coord[0] + 1][coord[1]] != region
-    left = coord[1] - 1 < 0 or board[coord[0]][coord[1] - 1] != region
-    right = coord[1] + 1 >= len(board[0]) or board[coord[0]][coord[1] + 1] != region
-    total += above + below + left + right
-    
-    return total
+def has_edge_in_direction(coord, d, area_set):
+    ny, nx = coord[0] + d[0], coord[1] + d[1]
+    return not (ny in range(len(board)) and nx in range(len(board[0]))) or (ny,nx) not in area_set
 
+def not_in_board(y,x):
+    return not(y in range(len(board)) and x in range(len(board[0])))
 
-board: list[list] = []
-all_coords: set[tuple] = set()
+# def has_edge_in_direction(coord, d, area_set):
+#     ny, nx = coord[0] + d[0], coord[1] + d[1]    
+#     return not (ny in range(len(board)) or nx in range(len(board[0]))) or (ny,nx) not in area_set
+
+def find_perimeter(area_set):
+    total = 0
+    border_set = set()
+    
+    for coord in area_set:
+        for d in directions:
+            if has_edge_in_direction(coord, d, area_set):
+                total += 1
+                border_set.add(coord)  
+    return total, border_set
+
+"""
+if checking left/right, go down
+if checking up/down, go right
+"""
+
+def count_sides(border_set: set, area_set: set):
+    temp = border_set.copy()
+    side_count = 0
+    
+    while temp:
+        coord = temp.pop()
+        # print(coord)
+        for d in directions:
+            if has_edge_in_direction(coord, d, area_set):
+                # print(f"    has an edge in {d}")
+                if d[1] == 0:
+                    if not has_edge_in_direction((coord[0], coord[1] + 1), d, area_set) or (coord[0],coord[1] + 1) not in area_set:
+                        # print(f"        the coord {(coord[0], coord[1] + 1)} to the right doesn't have an edge to the {d} plus 1 side")
+                        side_count += 1
+                    # else:
+                    #     print(f"        the coord {(coord[0], coord[1] + 1)} to the right does have an edge to the {d}")
+                else:
+                    if not has_edge_in_direction((coord[0] + 1, coord[1]), d, area_set) or (coord[0] + 1, coord[1]) not in area_set:
+                        # print(f"        the coord {(coord[0] + 1, coord[1])} to the down doesn't have an edge to the {d}, plus 1 side")
+                        side_count += 1
+                    # else:
+                    #     print(f"        the coord {(coord[0] + 1, coord[1])} to the down does have an edge to the {d}")
+                    
+    
+    return side_count
+        
 
 with open("data.txt") as f:
     for line in f:
@@ -97,12 +84,15 @@ for i in range(len(board)):
 total = 0
 while len(all_coords) > 0:
     coord = all_coords.pop()
-    set_of_coords = map_plot(board, coord, set())
+    set_of_coords = map_plot(coord, set())
     
-    perimeter = find_perimeter(board, set_of_coords)
+    perimeter, border_set = find_perimeter(set_of_coords)
+    
+    sides = count_sides(border_set, set_of_coords)
+    print(f"{board[coord[0]][coord[1]]} {sides}")
     
     area = len(set_of_coords)
-    total += area * perimeter
+    total += area * sides
     
     # print(f"{coord=}")
     # print(f"crop: {board[coord[0]][coord[1]]}")
