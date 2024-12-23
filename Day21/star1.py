@@ -39,7 +39,6 @@ def find_paths(start_char, goal_char, using_num_pad: bool):
     
     return path_set
 
-@cache
 def find_paths_help(coord, y_diff, up: bool, x_diff, left, path_set, dictionary, string = ""):
     if coord == dictionary[" "]:
         return

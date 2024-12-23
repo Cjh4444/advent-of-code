@@ -1,6 +1,7 @@
 from itertools import product
 from collections import Counter
 import time
+from functools import cache
 
 num_pad_coords = {
     "9": (0,2),
@@ -33,8 +34,19 @@ directions = {
     ">": (0,1)
 }
 
+def find_min_length_path(string, max_depth, using_num_pad):
+    if (max_depth == 0):
+        return len(string)
+    
+    start_char = "A"
+    instructions = []
+    for char in string:
+        find_min_length
+
 found_path = False
-def find_paths(start_char, goal_char, using_num_pad: bool):
+
+@cache
+def find_paths_help(start_char, goal_char, using_num_pad: bool):
     global found_path
     found_path = False
     dictionary = num_pad_coords if using_num_pad else directional_pad_coords
@@ -82,7 +94,7 @@ with open("data.txt") as f:
     
     start_time = time.time()
     
-    cache: dict[tuple[str, str], set[str]] = {}
+    string_cache: dict[tuple[str, str], set[str]] = {}
     print("start building cache")
     # precalculate all paths
     for start_button in num_pad_coords:
@@ -91,7 +103,7 @@ with open("data.txt") as f:
         for end_button in num_pad_coords:
             if end_button == " ":
                 continue
-            cache[(start_button, end_button)] = find_paths(start_button, end_button, True)
+            string_cache[(start_button, end_button)] = find_paths(start_button, end_button, True)
     
     for start_button in directional_pad_coords:
         if start_button == " ":
