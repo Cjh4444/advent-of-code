@@ -1,80 +1,23 @@
-registers = {"A": [0], "B": [0], "C": [0]}
-combo_operand_map = [(0,),(1,),(2,),(3,),registers["A"],registers["B"],registers["C"]]
-program = []
-pointer = 0
-output = []
-
-def adv():
-    operand = int(program[pointer + 1])
-    registers["A"][0] = int(registers["A"][0] / (2 ** combo_operand_map[operand][0]))
-
-def bxl():
-    operand = int(program[pointer + 1])
-    registers["B"][0] = registers["B"][0] ^ operand
-
-def bst():
-    operand = int(program[pointer + 1])
-    registers["B"][0] = combo_operand_map[operand][0] % 8
-
-def jnz() -> int:
-    if registers["A"][0] == 0:
-        return pointer + 2
-    
-    operand = int(program[pointer + 1])
-    return operand
-
-def bxc():
-    operand = int(program[pointer + 1])
-    registers["B"][0] = registers["B"][0] ^ registers["C"][0]
-
-def out():
-    operand = int(program[pointer + 1])
-    output.append(str(combo_operand_map[operand][0] % 8))
-
-def bdv():
-    operand = int(program[pointer + 1])
-    registers["B"][0] = int(registers["A"][0] / (2 ** combo_operand_map[operand][0]))
-
-def cdv():
-    operand = int(program[pointer + 1])
-    registers["C"][0] = int(registers["A"][0] / (2 ** combo_operand_map[operand][0]))
+def solve(program, input):
+    if program == [] : return input
+    for b in range(8):
+        a = input << 3 | b
+        b = a % 8
+        b = b ^ 1
+        c = a >> b
+        b = b ^ c
+        b = b ^ 4
+        if b % 8 == program[-1]:
+            x = solve(program[:-1], a)
+            if x is None: 
+                continue
+            return x
     
 with open("data.txt") as f:
-    registers["A"][0] = int(f.readline().split()[2])
-    registers["B"][0] = int(f.readline().split()[2])
-    registers["C"][0] = int(f.readline().split()[2])
+    for i in range(4):
+        f.readline()
     
-    f.readline()
+    program = [int(x) for x in f.readline().split()[1].split(",")]
     
-    program = f.readline().split()[1].split(",")
-    
-    i = 26753260
-    while program != output:
-        print(i)
-        registers["A"][0] = i
-        registers["B"][0] = 0
-        registers["C"][0] = 0
-        pointer = 0
-        output = []
-        while pointer < len(program):
-            opcode = program[pointer]
-            if opcode == "0":
-                adv()
-            elif opcode == "1":
-                bxl()
-            elif opcode == "2":
-                bst()
-            elif opcode == "3":
-                pointer = jnz()
-                continue
-            elif opcode == "4":
-                bxc()
-            elif opcode == "5":
-                out()
-            elif opcode == "6":
-                bdv()
-            elif opcode == "7":
-                cdv()
-            pointer += 2
-        i += 1
-    print(f"copy: {i - 1}")
+    # print(program)
+    print(solve(program,0))
