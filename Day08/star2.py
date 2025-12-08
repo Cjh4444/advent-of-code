@@ -32,30 +32,30 @@ def clusters_shortest_n(distances: dict[tuple[tuple, tuple], int], n):
 
         distances.pop(smallest_pair)
 
-        _ = smallest_pair[0] in added_points
-        __ = smallest_pair[1] in added_points
+        pair1_in_cluster = smallest_pair[0] in added_points
+        pair2_in_cluster = smallest_pair[1] in added_points
 
         first_cluster = None
         second_cluster = None
 
-        if _:
+        if pair1_in_cluster:
             for cluster in clusters:
                 if smallest_pair[0] in cluster:
                     first_cluster = cluster
 
-        if __:
+        if pair2_in_cluster:
             for cluster in clusters:
                 if smallest_pair[1] in cluster:
                     second_cluster = cluster
 
-        if _ and __:
+        if pair1_in_cluster and pair2_in_cluster:
             # merge clusters case
             if first_cluster == second_cluster:
                 continue
             clusters.remove(second_cluster)
             first_cluster.update(second_cluster)
-        elif _ or __:
-            if _:
+        elif pair1_in_cluster or pair2_in_cluster:
+            if pair1_in_cluster:
                 first_cluster.add(smallest_pair[1])
                 added_points.add(smallest_pair[1])
             else:
